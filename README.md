@@ -20,8 +20,13 @@ of the software maintanance:
 
 Test suites divide project into functionalities which need to be tested. For a
 web browser project that could be: the renderer, JS compiler, UX etc. Each test
-suite may have other test (sub-)suites and test cases as its children. Test case
-is always a leaf node. Test case may be either manual or automated test.
+suite may have other test (sub-)suites and test scenarios as its children.
+
+Test scenario is a usage pattern and it may have zero or more test cases. For
+instance scenario may be "add a bookmark" while test cases could be: add
+bookmark to a website, add bookmark to a file, add bookmark to invalid object
+(should signal error). Test scenario is considered to be a leaf node in the Test
+Suite tree.
 
 Test plans are meant for test managament (as in human assignments). We could do
 full regression testing before a new release or have a plan for testing specific
@@ -65,16 +70,33 @@ CLEST design is stratified.
     clest:child-already-exists
     clest:child-doesnt-exist
 
+### Test Suite tree protocol
+
+PARENT type is intentionally not specified. If children are projects it may be a
+CLIM applicatino frame, a database, a hash table etc. In that case this
+parameter is meant to be specialized by the protocol implementer.
+
+Children are designated by their names which are strings. Parent can't have two
+children having the same name (names must be unique among sibling
+nodes). Siblings are not necessarily of the same type (for instance a project
+may have both test-suite and test-scenario as its direct children).
+
+    clest:list-children parent
+
+Returns a sequence of all parent direct children.
+
+    clest:load-child parent (name string)
+
+Looks for a parent's child. If a project does not exist in parent's collection a
+condition of type CLEST:CHILD-DOESNT-EXIST is signalled. Otherwise returns
+requested node.
+
+    clest:delete-child parent (name string)
+
+Deletes a child from parent. If a project does not exist in parent's collection
+a condition of type CLEST:CHILD-DOESNT-EXIST is signalled.
+
 ### Project parent protocol
-
-PARENT type is intentionally not specified. It may be a CLIM application frame,
-a database, a list etc. This parameter is meant to be specialized by the
-protocol implementer. Projects are designated by their names which must be
-unique in a scope of the parent.
-
-    clest:list-projects parent
-
-Returns a sequence of all projects which are parent direct children.
 
     clest:save-project parent (object clest:project)
 
@@ -82,40 +104,30 @@ Makes OBJECT part of the parent's collection. If parent already has a project
 having the same name, a condition of type CLEST:CHILD-ALREADY-EXISTS is
 signalled.
 
-    clest:load-project parent (designator string)
-
-Looks for a child in the parent's collection. Designator is project's name which
-is a STRING. If a project does not exist in parent's collection a condition of
-type CLEST:CHILD-DOESNT-EXIST is signalled. Otherwise returns requested project.
-
-    clest:delete-project parent (designator string)
-
-Deletes a project from the parent's collection. Designator is project's name
-which is a string. If a project does not exist in parent's collection a
-condition of type CLEST:CHILD-DOESNT-EXIST is signalled.
-
 ### Test suite parent protocol
 
 PARENT of each test-suite must be a project or another test-suite. That means
 that both PROJECT and TEST-SUITE must obey this protocol as parents.
 
-    clest:list-test-suites parent
     clest:save-test-suite parent (object clest:test-suite)
-    clest:load-test-suite parent (designator string)
-    clest:delete-test-suite (designator string)
 
-### Test case parent protocol
+Purpose and use of these functions is similar to the project parent protocol.
 
-PARENT of each test-case must be a project or a test-suite. That means that both
-PROJECT and TEST-SUITE must obey this protocol as parents.
+### Test scenario parent protocol
 
-    clest:list-test-cases parent
-    clest:save-test-case parent (object clest:test-case)
-    clest:load-test-case parent (designator string)
-    clest:delete-test-case (designator string)
+PARENT of each test-scenario must be a project or a test-suite. That means that
+both PROJECT and TEST-SUITE must obey this protocol as a parent.
+
+    clest:save-test-scenario parent (object clest:test-scenario)
+
+Purpose and use of these functions is similar to the project parent protocol.
+
+### Synopsis protocol
+
+
 
 ### Project protocol
 
-    clest:list-test-suites (parent project)
+    clest:documentation (parent clest:project)
 
 Returns a sequence of test suites which are parent direct children.
