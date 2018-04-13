@@ -8,7 +8,9 @@
 (define-protocol-class test-scenario) ; usage pattern (tree leafs)
 (define-protocol-class test-case)     ; cases of usage pattern
 (define-protocol-class testing-plan)  ; testing plan
-(define-protocol-class release)       ; currently tested build (release)
+(define-protocol-class build)         ; currently tested build (release)
+(define-protocol-class requirement)   ; software specification
+(define-protocol-class documentation) ; software documentation
 
 
 ;;;; Protocol
@@ -53,8 +55,8 @@
    load-plan
    delete-plan))
 
-(define-tree-protocol release (tree)
-  (list-releases
-   save-release
-   load-release
-   delete-release))
+(define-tree-protocol build (tree)
+  (list-builds
+   save-build
+   load-build
+   delete-build))
