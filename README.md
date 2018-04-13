@@ -15,8 +15,8 @@ in the tests architecture. It is a root node of the following (distinct) aspects
 of the software maintanance:
 
 * Test Suite tree
-* Testing Plan / Build tree
-* Requirements and documentation
+<!-- * Testing Plan / Build tree -->
+<!-- * Requirements and documentation -->
 
 Test suites divide project into functionalities which need to be tested. For a
 web browser project that could be: the renderer, JS compiler, UX etc. Each test
@@ -28,15 +28,15 @@ bookmark to a website, add bookmark to a file, add bookmark to invalid object
 (should signal error). Test scenario is considered to be a leaf node in the Test
 Suite tree.
 
-Test plans are meant for test managament (as in human assignments). We could do
-full regression testing before a new release or have a plan for testing specific
-module which has been recently changed (or implemented). Each test plan may have
-associated many builds (platforms or succeeding release candidates).
+<!-- Test plans are meant for test managament (as in human assignments). We could do -->
+<!-- full regression testing before a new release or have a plan for testing specific -->
+<!-- module which has been recently changed (or implemented). Each test plan may have -->
+<!-- associated many builds (platforms or succeeding release candidates). -->
 
-Requirements are software blueprints. This aspect embodies things like
-specification, documentation, reference manual, technical notes etc. It may also
-contain an issue tracker and other entities which doesn't belong to the first
-two categories.
+<!-- Requirements are software blueprints. This aspect embodies things like -->
+<!-- specification, documentation, reference manual, technical notes etc. It may also -->
+<!-- contain an issue tracker and other entities which doesn't belong to the first -->
+<!-- two categories. -->
 
 ### Technical note
 
@@ -60,10 +60,10 @@ CLEST design is stratified.
     clest:test-suite
     clest:test-scenario
     clest:test-case
-    clest:testing-plan
-    clest:build
-    clest:requirement
-    clest:documentation
+    <!-- clest:testing-plan -->
+    <!-- clest:build -->
+    <!-- clest:requirement -->
+    <!-- clest:documentation -->
 
 ### Core protocol conditions
 
@@ -100,9 +100,8 @@ a condition of type CLEST:CHILD-DOESNT-EXIST is signalled.
 
     clest:save-project parent (object clest:project)
 
-Makes OBJECT part of the parent's collection. If parent already has a project
-having the same name, a condition of type CLEST:CHILD-ALREADY-EXISTS is
-signalled.
+Makes OBJECT part of the parent's collection. If parent already has a project of
+the same name, a condition of type CLEST:CHILD-ALREADY-EXISTS is signalled.
 
 ### Test suite parent protocol
 
@@ -111,7 +110,7 @@ that both PROJECT and TEST-SUITE must obey this protocol as parents.
 
     clest:save-test-suite parent (object clest:test-suite)
 
-Purpose and use of these functions is similar to the project parent protocol.
+Purpose and use of this function is similar to the project parent protocol.
 
 ### Test scenario parent protocol
 
@@ -120,14 +119,27 @@ both PROJECT and TEST-SUITE must obey this protocol as a parent.
 
     clest:save-test-scenario parent (object clest:test-scenario)
 
-Purpose and use of these functions is similar to the project parent protocol.
-
-### Synopsis protocol
-
-
+Purpose and use of this functions is similar to the project parent protocol.
 
 ### Project protocol
 
-    clest:documentation (parent clest:project)
+Project must obey `test suite tree`, `test suite parent` and `test scenario
+parent` protocols. Additionally it must have implemented the following
+functions:
 
-Returns a sequence of test suites which are parent direct children.
+    clest:name (object clest:project)
+
+Returns project designator (which is a string).
+
+    clest:description (object clest:project)
+
+Returns project description. Its type is deliberely not specified but it should
+be printable with princ in a human-readable manner (aesthetically). It is object
+meant to be displayed to the software user as a project summary or its entry
+point.
+
+    clest:extensions (object clest:project)
+
+Returns a sequence of defined extensions. Function is here for a forward
+compatibility with extensions like issue tracker, test plans, reporting
+capabilities etc.
