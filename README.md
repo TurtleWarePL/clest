@@ -70,6 +70,19 @@ CLEST design is stratified.
     clest:child-already-exists
     clest:child-doesnt-exist
 
+### Synopsis protocol
+
+    clest:name object
+
+Returns object's designator which is a string.
+
+    clest:description (object clest:project)
+
+Returns object's description. Its type is deliberely not specified but it should
+be printable with princ in a human-readable manner (aesthetically). It is object
+meant to be displayed by the software as a project's summary or its entry point.
+
+
 ### Test Suite tree protocol
 
 PARENT type is intentionally not specified. If children are projects it may be a
@@ -85,6 +98,11 @@ may have both test-suite and test-scenario as its direct children).
 
 Returns a sequence of all parent direct children.
 
+    clest:save-project parent (object clest:project)
+
+Makes OBJECT part of the parent's collection. If parent already has a child of
+the same name, a condition of type CLEST:CHILD-ALREADY-EXISTS is signalled.
+
     clest:load-child parent (name string)
 
 Looks for a parent's child. If a project does not exist in parent's collection a
@@ -96,50 +114,60 @@ requested node.
 Deletes a child from parent. If a project does not exist in parent's collection
 a condition of type CLEST:CHILD-DOESNT-EXIST is signalled.
 
-### Project parent protocol
-
-    clest:save-project parent (object clest:project)
-
-Makes OBJECT part of the parent's collection. If parent already has a project of
-the same name, a condition of type CLEST:CHILD-ALREADY-EXISTS is signalled.
-
-### Test suite parent protocol
-
-PARENT of each test-suite must be a project or another test-suite. That means
-that both PROJECT and TEST-SUITE must obey this protocol as parents.
-
-    clest:save-test-suite parent (object clest:test-suite)
-
-Purpose and use of this function is similar to the project parent protocol.
-
-### Test scenario parent protocol
-
-PARENT of each test-scenario must be a project or a test-suite. That means that
-both PROJECT and TEST-SUITE must obey this protocol as a parent.
-
-    clest:save-test-scenario parent (object clest:test-scenario)
-
-Purpose and use of this functions is similar to the project parent protocol.
-
 ### Project protocol
 
-Project must obey `test suite tree`, `test suite parent` and `test scenario
-parent` protocols. Additionally it must have implemented the following
-functions:
+Project must obey `synopsis` and `test suite tree` protocols. Additionally the
+following functions must be defined:
 
-    clest:name (object clest:project)
+    clest:make-project type &key name parent
 
-Returns project designator (which is a string).
-
-    clest:description (object clest:project)
-
-Returns project description. Its type is deliberely not specified but it should
-be printable with princ in a human-readable manner (aesthetically). It is object
-meant to be displayed to the software user as a project summary or its entry
-point.
+Project constructor. TYPE must be specialized on a symbol with EQL
+specializer. NAME is a string, PARENT must obey the `project parent` protocol.
 
     clest:extensions (object clest:project)
 
 Returns a sequence of defined extensions. Function is here for a forward
 compatibility with extensions like issue tracker, test plans, reporting
 capabilities etc.
+
+### Test suite protocol
+
+Test suite must obey `synopsis` and `test suite tree` protocols. Additionally
+the following functions are defined:
+
+    clest:make-test-suite type &key name parent
+
+Test suite constructor. TYPE should be specialized on a symbol with EQL
+specializer. NAME is a string, PARENT must be either a project or another test
+suite.
+
+### Test scenario protocol
+
+Test scenario must obey `synopsis` and `test suite tree` protocols. Additionally
+the following functions are defined:
+
+    clest:make-scenario type &key name parent
+
+Test scenario constructor. TYPE should be specialized on a symbol with EQL
+specializer. NAME is a string, PARENT must be either a project or a test suite.
+
+    clest:promote-to-test-suite (object clest:test-scenario)
+
+As applications grow some test scenarios may grow into test suites. This method
+returns a test-suite object. All test-case children should be promoted to test
+scenarios.
+
+### Test case protocol
+
+Test cases must obey `synopsis` protocol. Additionally the following functions
+are defined:
+
+    clest:make-test-case type &key name parent
+
+Test case constructor. TYPE should be specialized on a symbol with EQL
+specializer. NAME is a string, PARENT must be a test scenario.
+
+    clest:promote-to-test-scenario (object clest:test-case)
+
+As applications grow some test cases become scenarios. This method returns a
+test-scenario object.

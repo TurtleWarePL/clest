@@ -6,5 +6,6 @@
 
 (defmethod make-test-scenario ((type (eql 'basic-test-scenario)) &key name parent)
   (check-type name string)
+  (check-type parent (or test-suite project))
   (let ((object (make-instance type :name name)))
-    (save-test-scenario parent object)))
+    (save-child parent object)))

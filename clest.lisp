@@ -7,7 +7,7 @@
      (defclass ,name ,super () ,@args)
      (defgeneric ,(alexandria:symbolicate 'make- name)
          (type &rest initargs &key name &allow-other-keys)
-       (:method ((type ,name) &key name)
+       (:method ((type (eql ',name)) &key name)
          (error "Protocol class ~s can't be instantiated." ',name)))))
 
 (defmacro define-protocol-function (name (&rest args) &body body)
@@ -57,7 +57,6 @@
              :accessor %children)))
 
 (defclass project-parent-mixin (tree-parent-mixin) ())
-
 
 (define-tree-protocol tree ()
   (list-children save-child load-child delete-child))

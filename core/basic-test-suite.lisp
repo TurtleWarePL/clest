@@ -7,5 +7,6 @@
 
 (defmethod make-test-suite ((type (eql 'basic-test-suite)) &key name parent)
   (check-type name string)
+  (check-type parent (or test-suite project))
   (let ((object (make-instance type :name name)))
-    (save-test-suite parent object)))
+    (save-child parent object)))

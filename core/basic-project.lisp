@@ -8,4 +8,4 @@
 (defmethod make-project ((type (eql 'basic-project)) &key name parent)
   (check-type name string)
   (let ((object (make-instance type :name name)))
-    (save-project parent object)))
+    (save-child parent object)))

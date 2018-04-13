@@ -1,5 +1,5 @@
 (defpackage #:clest/unit-tests
-  (:use #:cl #:1am #:clest)
+  (:use #:cl #:1am)
   (:export #:run-tests))
 (in-package #:clest/unit-tests)
 
@@ -11,7 +11,7 @@
     (populate-data project-class test-suite-class test-scenario-class)
     (test-project-protocol project-class)
     (terpri)
-    (test-test-suite-protocol test-suite-class :parent (clest:load-project nil "Sandbox Project"))
+    (test-test-suite-protocol test-suite-class :parent (clest:load-child nil "Sandbox Project"))
     (terpri)
     clest::*projects*))
 
@@ -57,68 +57,68 @@
       (clest:make-test-suite test-suite-class :parent parent :name "Environments"))))
 
 (defun test-project-protocol (project-class &key parent
-                              &aux (len (length (clest:list-projects parent))))
+                              &aux (len (length (clest:list-children parent))))
   ;; only strings as project names
   (signals error
     (clest:make-project project-class :name 3 :parent parent))
   (signals error
     (clest:make-project project-class :name :xxx :parent parent))
   (clest:make-project project-class :name "Foobar" :parent parent)
-  (is (= (1+ len) (length (clest:list-projects parent))))
+  (is (= (1+ len) (length (clest:list-children parent))))
   ;; can't load non-existing project
-  (signals error (clest:load-project parent "Quxbar"))
-  (clest:load-project parent "Foobar")
+  (signals error (clest:load-child parent "Quxbar"))
+  (clest:load-child parent "Foobar")
   ;; delete project (but only once)
-  (clest:delete-project parent "Foobar")
-  (signals error (clest:delete-project parent "Foobar"))
-  (is (= len (length (list-projects parent)))))
+  (clest:delete-child parent "Foobar")
+  (signals error (clest:delete-child parent "Foobar"))
+  (is (= len (length (clest:list-children parent)))))
 
 (defun test-test-suite-protocol (test-suite-class &key parent)
   ;; Adding new test suites
-  (is (null (clest:list-test-suites parent)))
+  (is (null (clest:list-children parent)))
   (let ((ts1 (clest:make-test-suite test-suite-class :name "TestSuite1" :parent parent))
         (ts2 (clest:make-test-suite test-suite-class :name "TestSuite2" :parent parent)))
    (signals error
      (clest:make-test-suite test-suite-class :name :test-suite-3 :parent parent))
    (signals error
      (clest:make-test-suite test-suite-class :name "TestSuite1" :parent parent))
-   (is (= (length (clest:list-test-suites parent)) 2))
+   (is (= (length (clest:list-children parent)) 2))
 
    ;; Adding sub-test suites
    (clest:make-test-suite test-suite-class :name "TestSuite1" :parent ts1)
    (clest:make-test-suite test-suite-class :name "TestSuite2a" :parent ts2)
-   (is (= (length (clest:list-test-suites parent)) 2))
-   (is (= (length (clest:list-test-suites ts1)) 1))
-   (is (= (length (clest:list-test-suites ts2)) 1))
+   (is (= (length (clest:list-children parent)) 2))
+   (is (= (length (clest:list-children ts1)) 1))
+   (is (= (length (clest:list-children ts2)) 1))
 
    ;; Removing test-suites
-   (clest:delete-test-suite ts1 "TestSuite1")
-   (clest:delete-test-suite parent "TestSuite2")
-   (is (= (length (clest:list-test-suites parent)) 1))
-   (is (= (length (clest:list-test-suites ts1)) 0))
-   (is (= (length (clest:list-test-suites ts2)) 1))))
+   (clest:delete-child ts1 "TestSuite1")
+   (clest:delete-child parent "TestSuite2")
+   (is (= (length (clest:list-children parent)) 1))
+   (is (= (length (clest:list-children ts1)) 0))
+   (is (= (length (clest:list-children ts2)) 1))))
 
 (defun test-test-scenario-protocol (test-scenario-class &key parent)
   ;; Adding new test suites
-  (is (null (clest:list-test-scenarios parent)))
+  (is (null (clest:list-children parent)))
   (let ((ts1 (clest:make-test-scenario test-scenario-class :name "TestScenario1" :parent parent))
         (ts2 (clest:make-test-scenario test-scenario-class :name "TestScenario2" :parent parent)))
     (signals error
       (clest:make-test-scenario test-scenario-class :name :test-suite-3 :parent parent))
     (signals error
       (clest:make-test-scenario test-scenario-class :name "TestScenario1" :parent parent))
-    (is (= (length (clest:list-test-scenarios parent)) 2))
+    (is (= (length (clest:list-children parent)) 2))
 
     ;; Adding sub-test suites
     (clest:make-test-scenario test-scenario-class :name "TestScenario1" :parent ts1)
     (clest:make-test-suite test-scenario-class :name "TestScenario2a" :parent ts2)
-    (is (= (length (clest:list-test-scenarios parent)) 2))
-    (is (= (length (clest:list-test-scenarios ts1)) 1))
-    (is (= (length (clest:list-test-scenarios ts2)) 1))
+    (is (= (length (clest:list-children parent)) 2))
+    (is (= (length (clest:list-children ts1)) 1))
+    (is (= (length (clest:list-children ts2)) 1))
 
     ;; Removing test-suites
-    (clest:delete-test-suite ts1 "TestSuite1")
-    (clest:delete-test-suite parent "TestSuite2")
-    (is (= (length (clest:list-test-suites parent)) 1))
-    (is (= (length (clest:list-test-suites ts1)) 0))
-    (is (= (length (clest:list-test-suites ts2)) 1))))
+    (clest:delete-child ts1 "TestSuite1")
+    (clest:delete-child parent "TestSuite2")
+    (is (= (length (clest:list-children parent)) 1))
+    (is (= (length (clest:list-children ts1)) 0))
+    (is (= (length (clest:list-children ts2)) 1))))
