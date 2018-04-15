@@ -13,10 +13,7 @@
                         :description "Core protocol and basic implementation."
                         :components ((:file "protocol")
                                      (:file "world") ; default root node
-                                     (:file "basic-project")
-                                     (:file "basic-test-suite")
-                                     (:file "basic-test-scenario")
-                                     #+ (or) (:file "test-case")))
+                                     (:file "basic-implementation")))
                (:module "tests"
                         :description "Unit tests of the protocol."
                         :components ((:file "unit-tests")))

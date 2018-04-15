@@ -15,6 +15,7 @@ in the tests architecture. It is a root node of the following (distinct) aspects
 of the software maintanance:
 
 * Test Suite tree
+
 <!-- * Testing Plan / Build tree -->
 <!-- * Requirements and documentation -->
 
@@ -25,8 +26,11 @@ suite may have other test (sub-)suites and test scenarios as its children.
 Test scenario is a usage pattern and it may have zero or more test cases. For
 instance scenario may be "add a bookmark" while test cases could be: add
 bookmark to a website, add bookmark to a file, add bookmark to invalid object
-(should signal error). Test scenario is considered to be a leaf node in the Test
-Suite tree.
+(should signal error).
+
+Software tends to grow and something being a small feature may become a
+module. For such situation test scenarios may be upgradeed to test suites (and
+in consequence their test cases become test scenarios).
 
 <!-- Test plans are meant for test managament (as in human assignments). We could do -->
 <!-- full regression testing before a new release or have a plan for testing specific -->
@@ -38,13 +42,13 @@ Suite tree.
 <!-- contain an issue tracker and other entities which doesn't belong to the first -->
 <!-- two categories. -->
 
-### Technical note
+<!-- ### Technical note -->
 
-Documentation as of now covers only Test Suite tree protocol. Testing plan,
-build, requirement and documentation nodes are just opaque objects until we
-implement them correctly (and define protocols for them). Testing plan should be
-part of this software while requirements and documentation are something we need
-to think about.
+<!-- Documentation as of now covers only Test Suite tree protocol. Testing plan, -->
+<!-- build, requirement and documentation nodes are just opaque objects until we -->
+<!-- implement them correctly (and define protocols for them). Testing plan should be -->
+<!-- part of this software while requirements and documentation are something we need -->
+<!-- to think about. -->
 
 ## Core protocol
 
@@ -60,15 +64,19 @@ CLEST design is stratified.
     clest:test-suite
     clest:test-scenario
     clest:test-case
-    <!-- clest:testing-plan -->
-    <!-- clest:build -->
-    <!-- clest:requirement -->
-    <!-- clest:documentation -->
+
+<!-- clest:testing-plan -->
+<!-- clest:build -->
+<!-- clest:requirement -->
+<!-- clest:documentation -->
 
 ### Core protocol conditions
 
     clest:child-already-exists
     clest:child-doesnt-exist
+    clest:invalid-designator
+
+<!-- clest:invalid-parent-type -->
 
 ### Synopsis protocol
 
@@ -119,7 +127,7 @@ a condition of type CLEST:CHILD-DOESNT-EXIST is signalled.
 Project must obey `synopsis` and `test suite tree` protocols. Additionally the
 following functions must be defined:
 
-    clest:make-project type &key name parent
+    clest:make-project type &key name parent &allow-other-keys
 
 Project constructor. TYPE must be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must obey the `project parent` protocol.
@@ -151,7 +159,7 @@ the following functions are defined:
 Test scenario constructor. TYPE should be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must be either a project or a test suite.
 
-    clest:promote-to-test-suite (object clest:test-scenario)
+    clest:promote-to-test-suite type (object clest:test-scenario)
 
 As applications grow some test scenarios may grow into test suites. This method
 returns a test-suite object. All test-case children should be promoted to test
@@ -167,7 +175,7 @@ are defined:
 Test case constructor. TYPE should be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must be a test scenario.
 
-    clest:promote-to-test-scenario (object clest:test-case)
+    clest:promote-to-test-scenario type (object clest:test-case)
 
 As applications grow some test cases become scenarios. This method returns a
 test-scenario object.
