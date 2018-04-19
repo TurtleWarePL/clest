@@ -111,10 +111,12 @@ Simplistic gadget version 2
 ===========================
 
 |#
-(defclass simplistic-tree-gadget-v2 (abstract-tree-gadget)
+(defclass simplistic-tree-gadget-v2 (abstract-tree-gadget climi::always-repaint-background-mixin)
   ((expanded :initform nil :accessor expanded)
    (buttons :initform (make-instance 'clim:standard-sequence-output-record)
-            :accessor buttons))
+            :accessor buttons)
+   (max-x :initform 250)
+   (max-y :initform 60))
   (:default-initargs :text-style (clim:make-text-style :fixed nil :normal)))
 
 (defmethod expandedp ((pane simplistic-tree-gadget-v2) node)
@@ -128,12 +130,22 @@ Simplistic gadget version 2
   (setf (clim:rectangle-edges* record)
         (values x1 y1 x2 y2)))
 
+(defmethod clim:compose-space ((pane simplistic-tree-gadget-v2) &key width height)
+  (declare (ignorable width height))
+  (clim:make-space-requirement :min-width (slot-value pane 'max-x)
+                               :width (slot-value pane 'max-x)
+                               :max-width (slot-value pane 'max-x)
+                               :min-height (slot-value pane 'max-y)
+                               :height (slot-value pane 'max-y)
+                               :max-height (slot-value pane 'max-y)))
+
 (defmethod clim:handle-repaint ((pane simplistic-tree-gadget-v2) region)
   (let* ((text-style (clim:pane-text-style pane))
          (text-height (+ (clim:text-style-descent text-style pane)
                          (clim:text-style-ascent text-style pane)))
          (text-width (clim:text-style-width text-style pane))
          (current-y 0))
+    (clim:clear-output-record (buttons pane))
     (labels ((print-record (node)
                (clim:draw-rectangle* pane
                                      0
