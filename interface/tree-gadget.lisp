@@ -35,16 +35,7 @@ Abstract gadget
 |#
 (defclass abstract-tree-gadget (clim:basic-gadget)
   ((root :initarg :root
-         :initform (error ":root argument is obligatory."))
-   (toggled :initform nil)))
-
-(defun toggle-node (tree node)
-  (check-type tree abstract-tree-gadget)
-  (check-type node tree-parent-mixin)
-  (with-slots (toggled) tree
-    (if (member node toggled)
-        (setf toggled (delete node toggled))
-        (push node toggled))))
+         :initform (error ":root argument is obligatory."))))
 #|
 
 Simplistic gadget (version 1)
@@ -63,13 +54,14 @@ illustratory example. Later we'll get more fancy and use output-records.
 
 |#
 
-(defclass simplistic-tree-gadget (abstract-tree-gadget)
+(defclass simplistic-tree-gadget (abstract-tree-gadget climi::always-repaint-background-mixin)
   ((expanded :initform nil :accessor expanded)
-   (max-x :initform 200)
-   (max-y :initform 200))
+   (max-x :initform 250)
+   (max-y :initform 60))
   (:default-initargs :text-style (clim:make-text-style :fixed nil :normal)))
 
 (defmethod clim:compose-space ((pane simplistic-tree-gadget) &key width height)
+  (declare (ignorable width height))
   (clim:make-space-requirement :min-width (slot-value pane 'max-x)
                                :width (slot-value pane 'max-x)
                                :max-width (slot-value pane 'max-x)
@@ -78,9 +70,6 @@ illustratory example. Later we'll get more fancy and use output-records.
                                :max-height (slot-value pane 'max-y)))
 
 (defmethod clim:handle-repaint ((pane simplistic-tree-gadget) region)
-  (clim:with-bounding-rectangle* (x1 y1 x2 y2)
-      (clim:region-intersection region (clim:sheet-region pane))
-    (clim:draw-rectangle* pane  x1 y1 x2 y2 :ink clim:+background-ink+))
   (with-slots (max-x max-y) pane
     (setf max-x 0
           max-y 0))
@@ -100,25 +89,18 @@ illustratory example. Later we'll get more fancy and use output-records.
                    (clim:draw-text* pane node-text 0 current-y :align-y :top)
                    (incf current-y text-height)
                    (with-slots (max-x max-y) pane
-                     (setf max-x (max max-x (+ offset
-                                               (clim:text-size pane node-text)))
-                           max-y current-y)
-                     (if (< max-x 180)
-                         (setf max-x 180)
-                         (setf max-x 250))
-                     (if (< max-y 60)
-                         (setf max-y 60)
-                         (setf max-y 550)))
+                     (setf max-x (max 250 max-x (+ offset
+                                                   (clim:text-size pane node-text)))
+                           max-y (max 60 max-y current-y)))
                    (when (expanded pane)
                      (clim:with-translation (pane (* 4 text-width) 0)
                        (print-node c (+ offset (* 4 text-width)))))))))
-      (print-node (slot-value pane 'root)))))
+      (print-node (slot-value pane 'root))))
+  (clim:change-space-requirements pane :resize-frame t))
 
 (defmethod clim:handle-event ((pane simplistic-tree-gadget)
                               (event clim:pointer-button-press-event))
   (setf (expanded pane) (not (expanded pane)))
-  (clim:handle-repaint pane clim:+everywhere+)
-  (clim:change-space-requirements pane :resize-frame t)
   (clim:handle-repaint pane clim:+everywhere+))
 
 
@@ -129,7 +111,7 @@ Simplistic gadget version 2
 ===========================
 
 |#
-(defclass simplistic-tree-gadget-v2 (simplistic-tree-gadget)
+(defclass simplistic-tree-gadget-v2 (abstract-tree-gadget)
   ((expanded :initform nil :accessor expanded)
    (buttons :initform (make-instance 'clim:standard-sequence-output-record)
             :accessor buttons))
@@ -147,10 +129,6 @@ Simplistic gadget version 2
         (values x1 y1 x2 y2)))
 
 (defmethod clim:handle-repaint ((pane simplistic-tree-gadget-v2) region)
-  (clim:with-bounding-rectangle* (x1 y1 x2 y2)
-      (clim:region-intersection region (clim:sheet-region pane))
-    (clim:draw-rectangle* pane  x1 y1 x2 y2 :ink clim:+background-ink+)
-    (clim:clear-output-record (buttons pane)))  
   (let* ((text-style (clim:pane-text-style pane))
          (text-height (+ (clim:text-style-descent text-style pane)
                          (clim:text-style-ascent text-style pane)))
@@ -189,7 +167,9 @@ Simplistic gadget version 2
                    (when (expandedp pane c)
                      (clim:with-translation (pane (* 4 text-width) 0)
                        (print-node c)))))))
-      (print-node (slot-value pane 'root)))))
+      (print-node (slot-value pane 'root)))
+    (setf (slot-value pane 'max-y) current-y))
+  (clim:change-space-requirements pane))
 
 (defmethod clim:handle-event ((pane simplistic-tree-gadget-v2)
                               (event clim:pointer-button-press-event))
@@ -206,6 +186,15 @@ Simplistic gadget version 2
    (clim:pointer-event-y event)))
 
 #|
+
+Simplistic gadget version 3
+===========================
+
+|#
+
+(defclass simplistic-tree-gadget-v3 (abstract-tree-gadget) ())
+
+#|
 
 Material gadget
 ===============
@@ -215,4 +204,4 @@ https://vmware.github.io/clarity/documentation/v0.11/tree-view
 |#
 
 
-(defclass material-tree-gadget (generic-tree-gadget) ())
+(defclass material-tree-gadget (abstract-tree-gadget) ())

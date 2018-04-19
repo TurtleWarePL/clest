@@ -56,6 +56,8 @@
              :type 'hash-table
              :accessor %children)))
 
+(defclass tree-leaf-mixin (name-desc-mixin) ())
+
 (defclass project-parent-mixin (tree-parent-mixin) ())
 
 (define-tree-protocol tree ()
@@ -63,6 +65,9 @@
 
 (defmethod list-children ((object tree-parent-mixin))
   (alexandria:hash-table-values (%children object)))
+
+(defmethod list-children ((object tree-leaf-mixin))
+  nil)
 
 (defmethod save-child ((parent tree-parent-mixin) object)
   (if #1=(gethash (name object) (%children parent))

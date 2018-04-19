@@ -31,7 +31,8 @@
   (let ((object (make-instance type :name name)))
     (save-child parent object)))
 
-(defclass basic-test-case (test-case)
+(defclass basic-test-case (test-case
+                           tree-leaf-mixin)
   ())
 
 (defmethod make-test-case ((type (eql 'basic-test-case)) &key name parent)

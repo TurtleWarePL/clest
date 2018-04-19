@@ -18,10 +18,11 @@
                          :root clim:*application-frame*))
   (:menu-bar nil))
 
-(defun run-ui (&optional (tree 'simplistic-tree-gadget))
+(defun run-ui (&optional (tree 'simplistic-tree-gadget-v2))
   (setf *projects* (clim:make-application-frame 'clest :tree tree))
   (clest/unit-tests::populate-data 'basic-project
                                    'basic-test-suite
                                    'basic-test-scenario
+                                   'basic-test-case
                                    *projects*)
   (clim:run-frame-top-level *projects*))
