@@ -84,10 +84,8 @@
 (defun test-project-protocol (project-class &key parent
                               &aux (len (length (clest:list-children parent))))
   ;; only strings as project names
-  (signals error
-    (clest:make-project project-class :name 3 :parent parent))
-  (signals error
-    (clest:make-project project-class :name :xxx :parent parent))
+  (signals error (clest:make-project project-class :name 3 :parent parent))
+  (signals error (clest:make-project project-class :name :xxx :parent parent))
   (clest:make-project project-class :name "Foobar" :parent parent)
   (is (= (1+ len) (length (clest:list-children parent))))
   ;; can't load non-existing project

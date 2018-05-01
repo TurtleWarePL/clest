@@ -8,47 +8,46 @@ south" – basically it means that in this software tests:
 * do not go south (because they go east!)
 * it is not exactly the opposite direction (ditto!)
 
+**Important note** This software is still a work in progress and it is not meant
+to be used yet. When a minimal version is finished a proper announcement will be
+published (and this note will be removed).
+
+## Contributing
+
+We are still working on the core protocol, documentation, system internals and
+figuring out other concepts important for the software development. We do not
+accept contributions for a time being.
+
 ## Forest structure
 
 CLEST instance maintains a collection of projects. Project is a central figure
 in the tests architecture. It is a root node of the following (distinct) aspects
 of the software maintanance:
 
-* Test Suite tree
-
-<!-- * Testing Plan / Build tree -->
-<!-- * Requirements and documentation -->
+### Test suites
 
 Test suites divide project into functionalities which need to be tested. For a
-web browser project that could be: the renderer, JS compiler, UX etc. Each test
-suite may have other test (sub-)suites and test scenarios as its children.
+web browser that could be: the renderer, JS compiler, UX etc. Each test suite
+may have other test (sub-)suites and test scenarios as its children.
 
-Test scenario is a usage pattern and it may have zero or more test cases. For
-instance scenario may be "add a bookmark" while test cases could be: add
-bookmark to a website, add bookmark to a file, add bookmark to invalid object
-(should signal error).
+Test scenario describes a usage pattern and it may have zero or more test
+cases. Example scenario could be "add a bookmark" and cases could be: "add
+bookmark to a website", "add bookmark to a file", "add bookmark to an invalid
+object (should signal error)".
 
-Software tends to grow and something being a small feature may become a
-module. For such situation test scenarios may be upgradeed to test suites (and
-in consequence their test cases become test scenarios).
+### Testing plans and software builds
 
-<!-- Test plans are meant for test managament (as in human assignments). We could do -->
-<!-- full regression testing before a new release or have a plan for testing specific -->
-<!-- module which has been recently changed (or implemented). Each test plan may have -->
-<!-- associated many builds (platforms or succeeding release candidates). -->
+Test plans are meant for test execution managament. We could do full regression
+testing before a new release or have a plan for testing specific module which
+has been recently modified (or implemented).
 
-<!-- Requirements are software blueprints. This aspect embodies things like -->
-<!-- specification, documentation, reference manual, technical notes etc. It may also -->
-<!-- contain an issue tracker and other entities which doesn't belong to the first -->
-<!-- two categories. -->
+Each test plan may have many builds associated. Builds may have different
+commits or may be built from the same commit but for different platforms etc.
 
-<!-- ### Technical note -->
-
-<!-- Documentation as of now covers only Test Suite tree protocol. Testing plan, -->
-<!-- build, requirement and documentation nodes are just opaque objects until we -->
-<!-- implement them correctly (and define protocols for them). Testing plan should be -->
-<!-- part of this software while requirements and documentation are something we need -->
-<!-- to think about. -->
+Requirements are software blueprints. This aspect embodies things like
+specification, documentation, reference manual, technical notes etc. It may also
+contain an issue tracker and other entities which doesn't belong to the first
+two categories.
 
 ## Core protocol
 
@@ -58,58 +57,68 @@ a programmer to subclass directly protocol classes and implement methods for
 them – other components should interoperate with them neverless. In this sense
 CLEST design is stratified.
 
-### Core protocol classes
+### Classes
 
-    clest:project
-    clest:test-suite
-    clest:test-scenario
-    clest:test-case
+    CLEST:PROJECT
+    CLEST:TEST-SUITE
+    CLEST:TEST-SCENARIO
+    CLEST:TEST-CASE
 
-<!-- clest:testing-plan -->
-<!-- clest:build -->
-<!-- clest:requirement -->
-<!-- clest:documentation -->
+<!-- TESTING-PLAN -->
+<!-- BUILD -->
+<!-- REQUIREMENT -->
+<!-- DOCUMENTATION -->
 
-### Core protocol conditions
+### Conditions
 
-    clest:child-already-exists
-    clest:child-doesnt-exist
-    clest:invalid-designator
+    CLEST-ERROR (ERROR)
+    CHILD-ALREADY-EXISTS (CLEST-ERROR)
+    CHILD-DOESNT-EXIST (CLEST-ERROR)
+    INVALID-DESIGNATOR (CLEST-ERROR)
+    INVALID-PARENT-TYPE (CLEST-ERROR)
 
-<!-- clest:invalid-parent-type -->
+### Synopsis
 
-### Synopsis protocol
+Synopsis protocol is defined for general entity description capabilities. It
+defines two functions for purpose of listing them and providing their detail in
+the UI.
 
     clest:name object
 
 Returns object's designator which is a string.
 
-    clest:description (object clest:project)
+    clest:description object
 
 Returns object's description. Its type is deliberely not specified but it should
-be printable with princ in a human-readable manner (aesthetically). It is object
-meant to be displayed by the software as a project's summary or its entry point.
+be printable with princ in a human-readable manner (aesthetically).
 
 
 ### Test Suite tree protocol
 
-PARENT type is intentionally not specified. If children are projects it may be a
-CLIM applicatino frame, a database, a hash table etc. In that case this
-parameter is meant to be specialized by the protocol implementer.
+Test suites are arranged in a tree. Each project is a tree root whose children
+are either test suites or test scenarios. Test suite may be a parent of another
+test suites and test scenarios. Test scenario may be a parent of test cases.
+
+In the test suite tree protocol PARENT type is intentionally not specified. If
+children are projects it may be a CLIM applicatino frame, a database, a hash
+table etc. In that case this parameter is meant to be specialized by the
+protocol implementer.
 
 Children are designated by their names which are strings. Parent can't have two
 children having the same name (names must be unique among sibling
 nodes). Siblings are not necessarily of the same type (for instance a project
-may have both test-suite and test-scenario as its direct children).
+may have both test-suite and test-scenario as its direct descendents).
 
     clest:list-children parent
 
-Returns a sequence of all parent direct children.
+Returns a sequence of parent direct children.
 
-    clest:save-project parent (object clest:project)
+    clest:save-child parent object
 
 Makes OBJECT part of the parent's collection. If parent already has a child of
-the same name, a condition of type CLEST:CHILD-ALREADY-EXISTS is signalled.
+the same name a condition of type CLEST:CHILD-ALREADY-EXISTS is signalled. If
+PARENT can't be object's parent a condition of type CLEST:INVALID-PARENT-TYPE is
+signalled.
 
     clest:load-child parent (name string)
 

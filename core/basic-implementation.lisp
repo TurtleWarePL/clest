@@ -1,7 +1,6 @@
 (in-package #:clest)
 
 (defclass basic-project (project
-                         project-parent-mixin
                          test-suite-parent-mixin)
   ((test-plans :reader list-test-plans)))
 
