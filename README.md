@@ -159,12 +159,6 @@ the following functions are defined:
 Test scenario constructor. TYPE should be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must be either a project or a test suite.
 
-    clest:promote-to-test-suite type (object clest:test-scenario)
-
-As applications grow some test scenarios may grow into test suites. This method
-returns a test-suite object. All test-case children should be promoted to test
-scenarios.
-
 ### Test case protocol
 
 Test cases must obey `synopsis` protocol. Additionally the following functions
@@ -174,8 +168,3 @@ are defined:
 
 Test case constructor. TYPE should be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must be a test scenario.
-
-    clest:promote-to-test-scenario type (object clest:test-case)
-
-As applications grow some test cases become scenarios. This method returns a
-test-scenario object.
