@@ -3,17 +3,29 @@
 (defpackage #:clest
   (:use #:cl)
   ;; Protocol
-  (:export #:project       #:make-project       #:extensions
-           #:test-suite    #:make-test-suite
-           #:test-scenario #:make-test-scenario
-           #:test-case     #:make-test-case
+  (:export #:project
+           #:test-suite
+           #:test-scenario
+           #:test-case
+           ;; project protocol
+           #:make-project
+           #:extensions
+           ;; test suite protocol
+           #:make-test-suite
+           ;; test scenario protocol
+           #:make-test-scenario
+           ;; test case protocol
+           #:make-test-case
+           ;; synopsis protocol
+           #:name
+           #:description
+           ;; test tree protocol
+           #:list-children
+           #:save-child
+           #:load-child
+           #:delete-child
            ;; #:testing-plan  #:make-testing-plan
            ;; #:build         #:make-build
-           ;; test suite tree protocol
-           #:list-children #:load-child #:delete-child
-           #:save-project       ;; project parent protocols
-           #:save-test-suite    ;; test-suite parent protocol
-           #:save-test-scenario ;; test-scenario parent protocol
            )
   ;; Default implementation
   (:export #:basic-project

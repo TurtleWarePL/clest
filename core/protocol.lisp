@@ -30,7 +30,7 @@
 (defgeneric description (object)
   (:documentation "Returns opaque object being object's description."))
 
-;;; Test suite tree protocol
+;;; Test tree protocol
 (defgeneric list-children (parent))
 (defgeneric save-child (parent object))
 (defgeneric load-child (parent object))
@@ -45,8 +45,6 @@
 
 ;;; Test scenario protocol
 (defgeneric make-test-scenario (type &key name parent &allow-other-keys))
-(defgeneric promote-to-test-suite (type object))
 
 ;;; Test case protocol
 (defgeneric make-test-case (type &key name parent &allow-other-keys))
-(defgeneric promote-to-test-scenario (type object))
