@@ -64,18 +64,18 @@ CLEST design is stratified.
     CLEST:TEST-SCENARIO
     CLEST:TEST-CASE
 
-<!-- TESTING-PLAN -->
-<!-- BUILD -->
-<!-- REQUIREMENT -->
-<!-- DOCUMENTATION -->
+<!-- CLEST:TESTING-PLAN -->
+<!-- CLEST:BUILD -->
+<!-- CLEST:REQUIREMENT -->
+<!-- CLEST:DOCUMENTATION -->
 
 ### Conditions
 
-    CLEST-ERROR (ERROR)
-    CHILD-ALREADY-EXISTS (CLEST-ERROR)
-    CHILD-DOESNT-EXIST (CLEST-ERROR)
-    INVALID-DESIGNATOR (CLEST-ERROR)
-    INVALID-PARENT-TYPE (CLEST-ERROR)
+    CLEST:CLEST-ERROR (ERROR)
+    CLEST:CHILD-ALREADY-EXISTS (CLEST-ERROR)
+    CLEST:CHILD-DOESNT-EXIST (CLEST-ERROR)
+    CLEST:INVALID-DESIGNATOR (CLEST-ERROR)
+    CLEST:INVALID-PARENT-TYPE (CLEST-ERROR)
 
 ### Synopsis
 
@@ -83,11 +83,11 @@ Synopsis protocol is defined for general entity description capabilities. It
 defines two functions for purpose of listing them and providing their detail in
 the UI.
 
-    clest:name object
+    CLEST:NAME OBJECT
 
 Returns object's designator which is a string.
 
-    clest:description object
+    CLEST:DESCRIPTION OBJECT
 
 Returns object's description. Its type is deliberely not specified but it should
 be printable with princ in a human-readable manner (aesthetically).
@@ -109,24 +109,24 @@ children having the same name (names must be unique among sibling
 nodes). Siblings are not necessarily of the same type (for instance a project
 may have both test-suite and test-scenario as its direct descendents).
 
-    clest:list-children parent
+    CLEST:LIST-CHILDREN PARENT
 
 Returns a sequence of parent direct children.
 
-    clest:save-child parent object
+    CLEST:SAVE-CHILD PARENT OBJECT
 
 Makes OBJECT part of the parent's collection. If parent already has a child of
 the same name a condition of type CLEST:CHILD-ALREADY-EXISTS is signalled. If
 PARENT can't be object's parent a condition of type CLEST:INVALID-PARENT-TYPE is
 signalled.
 
-    clest:load-child parent (name string)
+    CLEST:LOAD-CHILD PARENT (NAME STRING)
 
 Looks for a parent's child. If a project does not exist in parent's collection a
 condition of type CLEST:CHILD-DOESNT-EXIST is signalled. Otherwise returns
 requested node.
 
-    clest:delete-child parent (name string)
+    CLEST:DELETE-CHILD PARENT (NAME STRING)
 
 Deletes a child from parent. If a project does not exist in parent's collection
 a condition of type CLEST:CHILD-DOESNT-EXIST is signalled.
@@ -136,12 +136,12 @@ a condition of type CLEST:CHILD-DOESNT-EXIST is signalled.
 Project must obey `synopsis` and `test suite tree` protocols. Additionally the
 following functions must be defined:
 
-    clest:make-project type &key name parent &allow-other-keys
+    CLEST:MAKE-PROJECT TYPE &KEY NAME PARENT &ALLOW-OTHER-KEYS
 
 Project constructor. TYPE must be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must obey the `project parent` protocol.
 
-    clest:extensions (object clest:project)
+    CLEST:EXTENSIONS (OBJECT CLEST:PROJECT)
 
 Returns a sequence of defined extensions. Function is here for a forward
 compatibility with extensions like issue tracker, test plans, reporting
@@ -152,7 +152,7 @@ capabilities etc.
 Test suite must obey `synopsis` and `test suite tree` protocols. Additionally
 the following functions are defined:
 
-    clest:make-test-suite type &key name parent
+    CLEST:MAKE-TEST-SUITE TYPE &KEY NAME PARENT
 
 Test suite constructor. TYPE should be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must be either a project or another test
@@ -163,7 +163,7 @@ suite.
 Test scenario must obey `synopsis` and `test suite tree` protocols. Additionally
 the following functions are defined:
 
-    clest:make-scenario type &key name parent
+    CLEST:MAKE-SCENARIO TYPE &KEY NAME PARENT
 
 Test scenario constructor. TYPE should be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must be either a project or a test suite.
@@ -173,7 +173,7 @@ specializer. NAME is a string, PARENT must be either a project or a test suite.
 Test cases must obey `synopsis` protocol. Additionally the following functions
 are defined:
 
-    clest:make-test-case type &key name parent
+    CLEST:MAKE-TEST-CASE TYPE &KEY NAME PARENT
 
 Test case constructor. TYPE should be specialized on a symbol with EQL
 specializer. NAME is a string, PARENT must be a test scenario.
