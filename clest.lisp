@@ -69,6 +69,9 @@
 (defmethod list-children ((object tree-leaf-mixin))
   nil)
 
+(defmethod list-children ((object hash-table))
+  (alexandria:hash-table-values object))
+
 (defmethod save-child ((parent tree-parent-mixin) object)
   (if #1=(gethash (name object) (%children parent))
       (error "Child ~s already exist in ~s." (name object) (name parent))
