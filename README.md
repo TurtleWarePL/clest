@@ -1,11 +1,11 @@
 # CLEST – Common Lisp Tests go East
 
-This software is not meant as another Unit Testing Framework like Fiveam, Prove
-or Fiasco. It is close in spirit to TestLink – test managament software for
-Quality Assurance teams in various projects. Name is a non-translatable pun
-which originates from English idiom "go south" – basically it means that tests:
+This software is not meant as an another Unit Testing Framework like Fiveam,
+Prove or Fiasco. It is close in spirit to TestLink – test managament software
+for Quality Assurance teams. Name is a pun originating from English idiom "go
+south" – basically it means that in this software tests:
 
-* does not go south (because they go east!)
+* do not go south (because they go east!)
 * it is not exactly the opposite direction (ditto!)
 
 ## Forest structure
