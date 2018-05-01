@@ -20,7 +20,7 @@
 (define-condition child-already-exists (clest-error) ())
 (define-condition child-doesnt-exist (clest-error) ())
 (define-condition invalid-designator (clest-error) ())
-;(define-condition invalid-parent-type (clest-error) )
+(define-condition invalid-parent-type (clest-error) ())
 
 
 ;;; Synopsis protocol
