@@ -11,6 +11,8 @@
          (declare (ignore type name))
          (error "Protocol class ~s can't be instantiated." ',name)))))
 
+(define-modify-macro togglef () not)
+
 
 ;;; Mixins
 (defclass name-desc-mixin ()
