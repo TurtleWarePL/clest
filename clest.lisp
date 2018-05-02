@@ -5,7 +5,7 @@
 (defmacro define-protocol-class (name &optional super &rest args)
   `(progn
      (defclass ,name ,super () ,@args)
-     (defgeneric ,(alexandria:symbolicate 'make- name)
+     (defgeneric ,(symbolicate 'make- name)
          (type &rest initargs &key name &allow-other-keys)
        (:method ((type (eql ',name)) &key name)
          (declare (ignore type name))
@@ -21,11 +21,6 @@
    (desc :initform nil
          :initarg :description
          :accessor description)))
-
-(defmacro check-name (name)
-  (alexandria:once-only (name)
-    `(unless (stringp ,name)
-       (error 'invalid-designator))))
 
 (defclass tree-parent-mixin (name-desc-mixin)
   ((children :initform (make-hash-table :test #'equal)
@@ -43,23 +38,23 @@
 (defgeneric delete-child (parent name))
 
 (defmethod list-children ((object tree-parent-mixin))
-  (alexandria:hash-table-values (%children object)))
+  (hash-table-values (%children object)))
 
 (defmethod list-children ((object tree-leaf-mixin))
   nil)
 
 (defmethod list-children ((object hash-table))
-  (alexandria:hash-table-values object))
+  (hash-table-values object))
 
 (defmethod save-child ((parent tree-parent-mixin) object)
-  (if #1=(gethash (name object) (%children parent))
-      (error "Child ~s already exist in ~s." (name object) (name parent))
-      (setf #1# object)))
+  (if-let ((child #1=(gethash (name object) (%children parent))))
+    (error 'clest:child-already-exists :parent parent :child child :object object)
+    (setf #1# object)))
 
 (defmethod load-child ((parent tree-parent-mixin) (name string))
-  (or (gethash name (%children parent))
-      (error "Child ~s doesn't exist in ~s." name (name parent))))
+  (or (gethash name (%children parent) )
+      (error 'clest:child-doesnt-exist :parent parent :name  name)))
 
 (defmethod delete-child ((parent tree-parent-mixin) (name string))
   (or (remhash name (%children parent))
-      (error "Child ~s doesn't exist in ~s." name (name parent))))
+      (error 'clest:child-doesnt-exist :parent parent :name  name)))

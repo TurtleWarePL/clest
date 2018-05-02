@@ -10,15 +10,15 @@
                     (test-case-class 'clest::basic-test-case))
   (let ((clest::*projects* (make-hash-table :test #'equal)))
     (populate-data project-class test-suite-class test-scenario-class test-case-class)
-    (test-project-protocol project-class)
-    (terpri)
-    (test-test-suite-protocol test-suite-class :parent (clest:load-child nil "Sandbox Project"))
-    (terpri)
-    (test-test-scenario-protocol test-scenario-class :parent (clest:load-child nil "Sandbox Project"))
-    (terpri)
-    ;; (test-test-case-protocol test-case-class :parent (clest:load-child nil "Sandbox Project"))
-    ;; (terpri)
-    clest::*projects*))
+    (let* ((project (test-project-protocol project-class))
+           (test-suite (test-test-suite-protocol test-suite-class :parent project))
+           (test-scenario (test-test-scenario-protocol test-scenario-class :parent test-suite))
+           (test-case (test-test-case-protocol test-case-class :parent test-scenario)))
+      (is (typep project 'clest:project))
+      (is (typep test-suite 'clest:test-suite))
+      (is (typep test-scenario 'clest:test-scenario))
+      (is (typep test-case 'clest:test-case))
+      clest::*projects*)))
 
 (defun populate-data (project-class test-suite-class test-scenario-class test-case-class
                       &optional parent)
@@ -83,18 +83,30 @@
 
 (defun test-project-protocol (project-class &key parent
                               &aux (len (length (clest:list-children parent))))
-  ;; only strings as project names
-  (signals error (clest:make-project project-class :name 3 :parent parent))
-  (signals error (clest:make-project project-class :name :xxx :parent parent))
-  (clest:make-project project-class :name "Foobar" :parent parent)
+  "Tests project protocol. Returns created project \"UT Foobar Project\" (with no children)."
+  ;; 1. MAKE-PROJECT with name not being a string
+  (signals clest:invalid-designator (clest:make-project project-class :name 3 :parent parent))
+  (signals clest:invalid-designator (clest:make-project project-class :name :xxx :parent parent))
+  ;; 2. MAKE-PROJECT with valid parent
+  (clest:make-project project-class :name "UT Foobar Project" :parent parent)
   (is (= (1+ len) (length (clest:list-children parent))))
-  ;; can't load non-existing project
-  (signals error (clest:load-child parent "Quxbar"))
-  (clest:load-child parent "Foobar")
-  ;; delete project (but only once)
-  (clest:delete-child parent "Foobar")
-  (signals error (clest:delete-child parent "Foobar"))
-  (is (= len (length (clest:list-children parent)))))
+  ;; 3. MAKE-PROJECT twice with the same name
+  (signals clest:child-already-exists
+    (clest:make-project project-class :name "UT Foobar Project" :parent parent))
+
+  ;; 4. LOAD-CHILD non-existing project from PARENT
+  (signals clest:child-doesnt-exist (clest:load-child parent "UT Quxbar Project"))
+  ;; 5. LOAD-CHILD existing project from PARENT (ensure protocol class)
+  (is (typep (clest:load-child parent "UT Foobar Project") 'clest:project))
+  ;; 6. DELETE-CHILD existing project from PARENT
+  (clest:delete-child parent "UT Foobar Project")
+  (is (= len (length (clest:list-children parent))))
+  ;; 7. DELETE-CHILD twice existing project from PARENT
+  (signals clest:child-doesnt-exist (clest:delete-child parent "UT Foobar Project"))
+  ;; 8. DELETE-CHILD non-existing project from PARENT
+  (signals clest:child-doesnt-exist (clest:delete-child parent "UT Quxbar Project"))
+  ;; return project we can use in further tests
+  (clest:make-project project-class :name "UT Foobar Project" :parent parent))
 
 (defun test-test-suite-protocol (test-suite-class &key parent)
   ;; Adding new test suites
@@ -119,7 +131,8 @@
    (clest:delete-child parent "TestSuite2")
    (is (= (length (clest:list-children parent)) 1))
    (is (= (length (clest:list-children ts1)) 0))
-   (is (= (length (clest:list-children ts2)) 1))))
+   (is (= (length (clest:list-children ts2)) 1))
+   ts1))
 
 (defun test-test-scenario-protocol (test-scenario-class &key parent)
   ;; Adding new test scenarios
@@ -136,9 +149,12 @@
     (signals error
       (clest:make-test-scenario test-scenario-class :name "TestScenario1" :parent ts1))
     (signals error
-      (clest:make-test-suite test-scenario-class :name "TestScenario2a" :parent ts2))))
+      (clest:make-test-suite test-scenario-class :name "TestScenario2a" :parent ts2))
+    ts1))
 
 (defun test-test-case-protocol (test-case-class &key parent)
-  (clest:make-test-case test-case-class :parent parent :name "TestCase1")
-  (clest:make-test-case test-case-class :parent parent :name "TestCase2")
-  (is (= (length (clest:list-children parent)) 2)))
+  (let ((tc1 (clest:make-test-case test-case-class :parent parent :name "TestCase1"))
+        (tc2 (clest:make-test-case test-case-class :parent parent :name "TestCase2")))
+    (declare (ignore tc2))
+    (is (= (length (clest:list-children parent)) 2))
+    tc1))

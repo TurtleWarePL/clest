@@ -1,12 +1,19 @@
 ;;;; package.lisp
 
 (defpackage #:clest
-  (:use #:cl)
+  (:use #:cl #:alexandria)
   ;; Protocol
-  (:export #:project
+  (:export #+(or)classes
+           #:project
            #:test-suite
            #:test-scenario
            #:test-case
+           ;; conditions
+           #:clest-error
+           #:child-already-exists
+           #:child-doesnt-exist
+           #:invalid-designator
+           #:invalid-parent-type
            ;; project protocol
            #:make-project
            #:extensions

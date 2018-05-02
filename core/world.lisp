@@ -4,20 +4,20 @@
 (defvar *projects* (make-hash-table :test #'equal))
 
 (defmethod list-children ((parent null))
-  (alexandria:hash-table-values *projects*))
+  (hash-table-values *projects*))
 
 (defmethod load-child ((parent null) (name string))
   (or (gethash name *projects*)
-      (error "Project ~s doesn't exist." name)))
+      (error 'clest:child-doesnt-exist :parent parent :name name)))
 
 (defmethod delete-child ((parent null) (name string))
   (or (remhash name *projects*)
-      (error "Project ~s doesn't exist." name)))
+      (error 'clest:child-doesnt-exist :parent parent :name name)))
 
 (defmethod save-child ((parent null) (object project))
-  (if (null #1=(gethash (name object) *projects*))
-      (setf #1# object)
-      (error "Project ~s already exist." (name object))))
+  (if-let ((child #1=(gethash (name object) *projects*)))
+    (error 'clest:child-already-exists :parent parent :child child :object object)
+    (setf #1# object)))
 
 
 ;;; Parent mixins

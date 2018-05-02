@@ -100,7 +100,7 @@ are either test suites or test scenarios. Test suite may be a parent of another
 test suites and test scenarios. Test scenario may be a parent of test cases.
 
 In the test suite tree protocol PARENT type is intentionally not specified. If
-children are projects it may be a CLIM applicatino frame, a database, a hash
+children are projects it may be a CLIM application frame, a database, a hash
 table etc. In that case this parameter is meant to be specialized by the
 protocol implementer.
 
